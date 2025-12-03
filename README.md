@@ -8,6 +8,7 @@
         <img alt="GitHub release" src="https://img.shields.io/github/v/release/dhschall/LLBP">
     </a>
     <a href="https://doi.org/10.5281/zenodo.13197409"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13197409.svg" alt="Trace DOI"></a>
+    <a href="https://doi.org/10.1109/MICRO61859.2024.00042"><img src="https://img.shields.io/badge/DOI-MICRO61859.2024.00042-blue" alt="Trace DOI"></a>
     <a href="https://github.com/dhschall/LLBP/actions/workflows/build-and-run.yml">
         <img alt="Build and test" src="https://github.com/dhschall/LLBP/actions/workflows/build-and-run.yml/badge.svg">
     </a>
@@ -17,7 +18,7 @@
 
 The Last-Level Branch Predictor (LLBP) is a microarchitectural approach that improves branch prediction accuracy through additional high-capacity storage backing the baseline TAGE predictor. The key insight is that LLBP breaks branch predictor state into multiple program contexts which can be thought of as a call chain. Each context comprises only a small number of patterns and can be prefetched ahead of time. This enables LLBP to store a large number of patterns in a high-capacity structure and prefetch only the patterns for the upcoming contexts into a small, fast structure to overcome the long access latency of the high-capacity structure (LLBP).
 
-LLBP is presented at [MICRO 2024](https://microarch.org/micro57/).
+LLBP is presented at [MICRO 2024](https://doi.org/10.1109/MICRO61859.2024.00042).
 
 This repository contains the source code of the branch predictor model used to evaluate LLBP's prediction accuracy. The code is based on the [CBP5 framework](http://www.jilp.org/cbp2016/), but was heavily modified and extended with various statistics to evaluate the performance of LLBP and the baseline TAGE predictor.
 
@@ -128,8 +129,10 @@ If you use our work, please cite paper:
 @inproceedings{schall2024llbp,
   title={The Last-Level Branch Predictor},
   author={Schall, David and Sandberg, Andreas and Grot, Boris},
-  booktitle={Proceedings of the 57th Annual IEEE/ACM International Symposium on Microarchitecture},
-  year={2024}
+  booktitle={2024 57th IEEE/ACM International Symposium on Microarchitecture (MICRO)}, 
+  year={2024},
+  pages={464-479},
+  doi={10.1109/MICRO61859.2024.00042}
 }
 ```
 
