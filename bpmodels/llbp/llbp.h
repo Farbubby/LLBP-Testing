@@ -491,7 +491,17 @@ class LLBP : public TageSCL {
         int ovrPosAlias = 0;
         int ovrNegAlias = 0;
 
+        uint64_t gatedCycles = 0;
+
     } llbpstats;
+
+    // Variables for the power-efficient toggle
+    struct {
+        bool pred;
+    } tageState;
+
+    int tageAccuracyMonitor = 0;
+    const int TOGGLE_THRESHOLD = 1000;
 
 };
 

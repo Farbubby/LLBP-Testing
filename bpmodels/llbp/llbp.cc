@@ -414,7 +414,7 @@ void LLBP::llbpPredict(uint64_t pc) {
         KEY[i] = uint64_t(_key) << 10ULL | uint64_t(_i);
 
     }
-
+    
 
 
     // Get the current context (CCID)
@@ -1116,6 +1116,21 @@ void LLBP::PrintStat(double instr) {
             nCtxUseful++;
         }
     }
+
+    printf("LLBP power efficiency stats -------\n");
+    
+    // Calculate the fraction of cycles where LLBP was NOT gated
+    double activityFactor = (stats.total - llbpstats.gatedCycles) / (double)stats.total;
+    
+    // 1.0 is the baseline TAGE energy. 
+    // 0.53 is the additional energy overhead of active LLBP structures.
+    double relativeEnergy = 1.0 + (activityFactor * 0.53);
+
+    printf("LLBP:: GatedCycles: %ld (%.2f%% of total branches)\n", 
+           llbpstats.gatedCycles, (llbpstats.gatedCycles / (double)stats.total) * 100.0);
+    printf("LLBP:: TotalBranches: %ld\n", stats.total);
+    printf("LLBP:: ActivityFactor: %.4f\n", activityFactor);
+    printf("LLBP:: Est. Relative Energy: %.4f (Baseline TAGE = 1.0)\n", relativeEnergy);
 
 
     printf("LLBP branch predictor stats -------\n");
