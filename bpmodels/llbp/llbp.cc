@@ -200,7 +200,8 @@ bool LLBP::predict(uint64_t pc) {
 
     DPRINTF("Prov: [TAGE:%i, L2:%i]\n", tage_pred, llbp.isProvider);
 
-    tage_scl_pred = tage_pred;
+    // Save the baseline TAGE prediction
+    tageState.pred = tage_pred;
     scl_provider = tage_provider;
 
     // 3. SCL prediction
@@ -216,7 +217,7 @@ bool LLBP::predict(uint64_t pc) {
     }
 #endif
 
-    return tage_scl_pred;
+    return tageState.pred;
 }
 
 
@@ -414,8 +415,14 @@ void LLBP::llbpPredict(uint64_t pc) {
         KEY[i] = uint64_t(_key) << 10ULL | uint64_t(_i);
 
     }
-    
 
+    // Now perform the power toggle
+    if (tageAccuracyMonitor >= TOGGLE_THRESHOLD) {
+        llbpstats.gatedCycles++;
+        llbp.hit = 0;
+        llbp.isProvider = false;
+        return; 
+    }
 
     // Get the current context (CCID)
     auto ctx_key = rcr.getCCID();
@@ -472,6 +479,23 @@ void LLBP::llbpUpdate(uint64_t pc, bool resolveDir, bool predDir) {
     bool updateLLBP = llbp.isProvider;
     bool updateTAGE = !llbp.isProvider;
 
+    // 1. Determine if TAGE was correct (baseline assessment)
+    bool tageCorrect = (!llbp.isProvider) ? (predDir == resolveDir) : (tageState.pred == resolveDir);
+
+    // 2. Refined Monitor Update
+    if (tageCorrect && (tageConf == HighConf)) {
+        /* Only move toward gating LLBP if TAGE is correct 
+        AND LLBP wasn't uniquely useful here.
+        If llbpUseful is true, LLBP saved us from a TAGE misprediction,
+        so we want to keep it active.
+        */
+        if (!llbpUseful(resolveDir)) {
+            if (tageAccuracyMonitor < 1023) tageAccuracyMonitor++;
+        }
+    } else if (!tageCorrect) {
+        // Instant reset: If TAGE fails, we need the high-capacity LLBP immediately[cite: 559].
+        tageAccuracyMonitor = 0; 
+    }
 
     // Only the providing component is updated.
     // If the prediction came from LLBP its pattern gets updated.
